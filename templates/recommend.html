@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Recommender System</title>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        background: linear-gradient(135deg, #bcd8c1 0%, #9fc7a5 100%);
+        color: #013b2e;
+        margin: 0;
+        padding: 0;
+    }
+
+    .text-white {
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        margin: 12px 0;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease;
+        padding: 12px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display:block;
+    }
+
+    h1.text-white {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+        padding: 40px 20px;
+    }
+    .search-area{margin-bottom:18px}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0 18px 0}
+    .controls input[type=number], .controls input[type=text]{padding:8px;border-radius:6px;border:1px solid #cfe6d6}
+    .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;align-items:start}
+    .rec-card{display:flex;flex-direction:column;background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);overflow:hidden}
+    .img-placeholder{height:200px;background:linear-gradient(180deg,#f6f6f6,#ededed);display:flex;align-items:center;justify-content:center;color:#9aa;font-size:14px}
+    .rec-card .card-body{padding:12px 14px}
+    .results-wrapper{max-width:1200px;margin:0 auto;width:100%;padding-top:10px}
+</style>
+<body>
+
+    <nav class="navbar" style="background: #222e50; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="container" style="display: flex; align-items: center;">
+            <a class="navbar-brand" style="color: #47c7e0; font-family: 'Poppins', sans-serif; font-size: 5rem; letter-spacing: 1px; font-weight: 700;">Book Recs</a>
+            <ul class="nav navbar-nav" style="margin-left: 20px; margin-bottom: 0;">
+                <li><a href="/" style="color: #47c7e0; font-size: 20px; font-weight: 500; transition: color 0.3s ease;">Home</a></li>
+                <li><a href="/recommend_ui" style="color: #47c7e0; font-size: 20px; font-weight: 500; transition: color 0.3s ease;">Recommend</a></li>
+                <li><a href="/contact" style="color: #47c7e0; font-size: 20px; font-weight: 500; transition: color 0.3s ease;">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-white" style="font-size:50px; color: #1c715d">Recommend Books</h1>
+                <p style="color: #013b2e; font-size: 14px; margin-bottom: 16px;">Search for a book and adjust the recommendation weights below to fine-tune results.</p>
+                <div class="search-area">
+                    <input id="queryInput" name="user_input" type="text" class="form-control" placeholder="Type a book title, e.g. The Da Vinci Code" style="margin-bottom: 8px; padding: 10px; border: 2px solid #222e50; border-radius: 5px;">
+                    <div class="controls">
+                        <button id="runSearch" class="btn btn-lg" style="background-color: #222e50; color: #47c7e0; border: none; padding: 10px 20px; border-radius: 5px;">Get Recommendations</button>
+                        <label style="color:#013b2e; margin-left:8px;">n</label>
+                        <input id="paramN" type="number" value="8" min="1" max="50" style="width:70px;">
+
+                        <div style="display:flex; gap:6px; align-items:center; margin-left:8px;">
+                            <label style="color:#013b2e; margin-right:6px;">w_collab</label>
+                            <input id="w_collab" type="number" value="0.6" step="0.05" style="width:90px;">
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <label style="color:#013b2e; margin-right:6px;">w_content</label>
+                            <input id="w_content" type="number" value="0.3" step="0.05" style="width:90px;">
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <label style="color:#013b2e; margin-right:6px;">w_pop</label>
+                            <input id="w_pop" type="number" value="0.1" step="0.05" style="width:90px;">
+                        </div>
+                    </div>
+                    <div style="background: #f6f8f7; padding: 12px 14px; border-radius: 6px; margin-top: 12px; font-size: 13px; color: #375a48; line-height: 1.6;">
+                        <strong>How to use the weights:</strong><br>
+                        <strong>w_content:</strong> Increase this to find books similar to your choice (same genre, author style, themes)<br>
+                        <strong>w_collab:</strong> Increase this to get recommendations based on what other readers like (if you like this, others who liked it also loved...)<br>
+                        <strong>w_pop:</strong> Increase this to see more popular and highly-rated books
+                    </div>
+                </div>
+            </div>
+
+            {% if data %}
+                <div class="col-md-12">
+                    <div class="results-wrapper">
+                <div class="results-grid">
+                {% for i in data %}
+                    <div class="rec-card">
+                        {% if i.image %}
+                            <img class="card-img-top" src="{{ i.image }}" alt="{{ i.title }} cover" onerror="this.style.display='none'">
+                        {% else %}
+                            <div class="img-placeholder">No cover available</div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div style="font-weight:700; color:#013b2e; margin-bottom:6px;">{{ i.title }}</div>
+                            <div style="color:#1c715d; margin-bottom:8px;">{{ i.authors }}</div>
+                            <div style="display:flex; justify-content:space-between; font-size:13px; color:#555;">
+                                <div>Hybrid: {{ '%.3f' % i.hybrid_score }}</div>
+                                <div style="text-align:right;">C:{{ '%.2f' % i.content_score }} • CF:{{ '%.2f' % i.collab_score }}</div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:#777;">
+                                <div>Votes: {{ i.votes }}</div>
+                                <div style="color:#1c715d;">Rating: {{ '%.1f' % i.rating }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-md-12">
+                <div id="resultsRow" style="width:100%; margin-top:30px"></div>
+            </div>
+
+            <script>
+                // Helper to read query params
+                function param(name){
+                    const url = new URL(window.location.href);
+                    return url.searchParams.get(name);
+                }
+
+                async function fetchRecs(title, n, w_collab, w_content, w_pop){
+                    if (!title || title.trim() === '') {
+                        document.getElementById('resultsRow').innerHTML = '<div style="color:#b30000;">Please enter a book title</div>';
+                        return;
+                    }
+                    try {
+                        const params = new URLSearchParams({
+                            title: title.trim(),
+                            n: n || 8,
+                            w_collab: w_collab || 0.6,
+                            w_content: w_content || 0.3,
+                            w_pop: w_pop || 0.1
+                        });
+                        console.log('Fetching recommendations with params:', params.toString());
+                        const resp = await fetch('/recommend?'+params.toString());
+                        if(!resp.ok){
+                            const txt = await resp.text();
+                            console.error('Error response:', txt);
+                            document.getElementById('resultsRow').innerHTML = '<div style="color:#b30000;">Error: '+txt+'</div>';
+                            return;
+                        }
+                        const j = await resp.json();
+                        renderResults(j.results);
+                    } catch (error) {
+                        console.error('Error fetching recommendations:', error);
+                        document.getElementById('resultsRow').innerHTML = '<div style="color:#b30000;">Error fetching recommendations: '+error.message+'</div>';
+                    }
+                }
+
+                function renderResults(results){
+                    const container = document.getElementById('resultsRow');
+                    container.innerHTML = '';
+                    if(!results || results.length === 0){
+                        container.innerHTML = '<p style="color:#013b2e;">No recommendations found.</p>';
+                        return;
+                    }
+                    // build a grid container
+                    const grid = document.createElement('div');
+                    grid.className = 'results-grid';
+                    for(const r of results){
+                        const card = document.createElement('div');
+                        card.className = 'rec-card';
+                        const imgHtml = r.image ? `<img class="card-img-top" src="${escapeHtml(r.image)}" onerror="this.style.display='none'">` : `<div class="img-placeholder">No cover available</div>`;
+                        card.innerHTML = `
+                            ${imgHtml}
+                            <div class="card-body">
+                                <div style="font-weight:700; color:#013b2e; margin-bottom:6px;">${escapeHtml(r.title)}</div>
+                                <div style="color:#1c715d; margin-bottom:8px;">${escapeHtml(r.authors)}</div>
+                                <div style="display:flex; justify-content:space-between; font-size:13px; color:#555;">
+                                    <div>Hybrid: ${Number(r.hybrid_score).toFixed(3)}</div>
+                                    <div style="text-align:right;">C:${Number(r.content_score).toFixed(2)} • CF:${Number(r.collab_score).toFixed(2)}</div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:#777;">
+                                    <div>Votes: ${r.votes}</div>
+                                    <div style="color:#1c715d;">Rating: ${Number(r.rating).toFixed(1)}</div>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    }
+                    container.appendChild(grid);
+                }
+
+                function escapeHtml(text){
+                    return text ? text.replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}) : '';
+                }
+
+                document.getElementById('runSearch').addEventListener('click', ()=>{
+                    const title = document.getElementById('queryInput').value || param('title');
+                    const n = document.getElementById('paramN').value || 8;
+                    const w_collab = document.getElementById('w_collab').value || 0.6;
+                    const w_content = document.getElementById('w_content').value || 0.3;
+                    const w_pop = document.getElementById('w_pop').value || 0.1;
+                    if(!title){ alert('Please enter a title'); return; }
+                    fetchRecs(title, n, w_collab, w_content, w_pop);
+                });
+
+                // If page has ?title=..., auto-run
+                window.addEventListener('load', ()=>{
+                    const q = param('title');
+                    if(q){
+                        document.getElementById('queryInput').value = q;
+                        const n = param('n') || 8;
+                        document.getElementById('paramN').value = n;
+                        const wc = param('w_collab') || 0.6;
+                        const wco = param('w_content') || 0.3;
+                        const wp = param('w_pop') || 0.1;
+                        document.getElementById('w_collab').value = wc;
+                        document.getElementById('w_content').value = wco;
+                        document.getElementById('w_pop').value = wp;
+                        // Only fetch if we have a title
+                        if(q.trim()) {
+                            fetchRecs(q, n, wc, wco, wp);
+                        }
+                    }
+                });
+            </script>
+
+
+
+
+        </div>
+    </div>
+
+</body>
+</html>

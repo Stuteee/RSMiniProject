@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Book — Book Recs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #bcd8c1 0%, #9fc7a5 100%);
+            color: #013b2e;
+            margin: 0;
+            padding: 0;
+        }
+
+        .text-white {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 12px 0;
+        }
+
+        .container {
+            padding: 40px 20px;
+        }
+
+        .book-detail {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .book-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        .book-cover {
+            width: 200px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-info h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1c715d;
+            margin-bottom: 12px;
+        }
+
+        .book-info .author {
+            font-size: 18px;
+            color: #2e6b56;
+            margin-bottom: 16px;
+        }
+
+        .book-info .stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .rating-section {
+            background: #f6f8f7;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .rating-section h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            color: #1c715d;
+            margin-bottom: 20px;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .star {
+            font-size: 48px;
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s ease, transform 0.2s ease;
+            user-select: none;
+        }
+
+        .star:hover, .star.active {
+            color: #ffc107;
+            transform: scale(1.1);
+        }
+
+        .rate-btn {
+            background-color: #222e50;
+            color: #47c7e0;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 12px;
+        }
+
+        .rate-btn:hover {
+            background-color: #1a2339;
+        }
+
+        .recommendations-section {
+            margin-top: 40px;
+        }
+
+        .recommendations-section h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            color: #1c715d;
+            margin-bottom: 20px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        .rec-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+
+        .rec-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .img-placeholder {
+            height: 180px;
+            background: linear-gradient(180deg, #f6f6f6, #ededed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9aa;
+            font-size: 14px;
+        }
+
+        .rec-card .card-body {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rec-card .book-title {
+            font-weight: 700;
+            color: #013b2e;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .rec-card .author {
+            color: #1c715d;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .rec-card .stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: auto;
+        }
+
+        h1.text-white {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .rating-message {
+            color: #0e4b3b;
+            font-weight: 600;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+
+        .no-recs {
+            color: #666;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" style="background: #222e50; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="container" style="display: flex; align-items: center;">
+            <a class="navbar-brand" style="color: #47c7e0; font-family: 'Poppins', sans-serif; font-size: 2.2rem; letter-spacing: 1px; font-weight: 700;">Book Recs</a>
+            <ul class="nav navbar-nav" style="margin-left: 20px; margin-bottom: 0; display: flex; gap: 14px;">
+                <li><a href="/" style="color: #47c7e0; font-size: 16px;">Home</a></li>
+                <li><a href="/recommend_ui" style="color: #47c7e0; font-size: 16px;">Recommend</a></li>
+                <li><a href="/contact" style="color: #47c7e0; font-size: 16px;">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="book-detail">
+            <div class="book-header">
+                {% if book.image %}
+                    <img class="book-cover" src="{{ book.image }}" alt="{{ book.title }}" onerror="this.style.display='none'">
+                {% else %}
+                    <div class="img-placeholder" style="width: 200px; height: 280px;">No cover available</div>
+                {% endif %}
+                <div class="book-info">
+                    <h1>{{ book.title }}</h1>
+                    <div class="author">{{ book.authors }}</div>
+                    <div class="stats">
+                        <div>Votes: {{ book.votes }}</div>
+                        <div>Avg Rating: {{ '%.1f' % book.rating }}/5</div>
+                    </div>
+                    <p style="color: #555; font-size: 14px; line-height: 1.6;">Tell us what you think of this book and discover similar titles you might enjoy.</p>
+                </div>
+            </div>
+
+            <div class="rating-section">
+                <h3>How did you like this book?</h3>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <div id="ratingText" style="color: #666; font-size: 14px; height: 20px;"></div>
+                <button class="rate-btn" id="submitRating" disabled>Submit Rating</button>
+                <div id="ratingMessage" class="rating-message" style="display: none;"></div>
+            </div>
+
+            <div id="recommendationsContainer" style="display: none;">
+                <div class="recommendations-section">
+                    <h3>✨ Because you liked this, you might like...</h3>
+                    <div class="results-grid" id="recommendationsGrid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRating = 0;
+        const ratingLabels = {
+            1: 'Not for me 😞',
+            2: 'Could be better 😐',
+            3: 'It was okay 👍',
+            4: 'Really enjoyed it! 😊',
+            5: 'Absolutely loved it! 🤩'
+        };
+
+        // Star rating interaction
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.rating);
+                updateStarDisplay();
+                updateRatingText();
+                document.getElementById('submitRating').disabled = false;
+            });
+
+            star.addEventListener('mouseover', () => {
+                const hoverRating = parseInt(star.dataset.rating);
+                document.querySelectorAll('.star').forEach((s, idx) => {
+                    if (idx < hoverRating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+                document.getElementById('ratingText').textContent = ratingLabels[hoverRating];
+            });
+        });
+
+        document.getElementById('starRating').addEventListener('mouseleave', () => {
+            updateStarDisplay();
+            updateRatingText();
+        });
+
+        function updateStarDisplay() {
+            document.querySelectorAll('.star').forEach((star, idx) => {
+                if (idx < selectedRating) {
+                    star.classList.add('active');
+                    star.style.color = '#ffc107';
+                } else {
+                    star.classList.remove('active');
+                    star.style.color = '#ddd';
+                }
+            });
+        }
+
+        function updateRatingText() {
+            const textEl = document.getElementById('ratingText');
+            if (selectedRating > 0) {
+                textEl.textContent = ratingLabels[selectedRating];
+            } else {
+                textEl.textContent = '';
+            }
+        }
+
+        // Submit rating and fetch recommendations
+        document.getElementById('submitRating').addEventListener('click', async () => {
+            const bookId = '{{ book.book_id }}';
+            const title = '{{ book.title }}';
+
+            try {
+                // Fetch recommendations
+                const params = new URLSearchParams({
+                    title: title.trim(),
+                    n: 6,
+                    w_collab: 0.6,
+                    w_content: 0.3,
+                    w_pop: 0.1
+                });
+
+                const resp = await fetch('/recommend?' + params.toString());
+                if (!resp.ok) {
+                    throw new Error('Failed to fetch recommendations');
+                }
+
+                const data = await resp.json();
+                renderRecommendations(data.results || []);
+
+                // Show rating message
+                const msg = document.getElementById('ratingMessage');
+                msg.textContent = `Thanks for rating! You gave it ${selectedRating} star${selectedRating !== 1 ? 's' : ''}.`;
+                msg.style.display = 'block';
+
+                // Show recommendations
+                document.getElementById('recommendationsContainer').style.display = 'block';
+
+                // Disable the button after submission
+                document.getElementById('submitRating').disabled = true;
+
+            } catch (error) {
+                console.error('Error:', error);
+                const msg = document.getElementById('ratingMessage');
+                msg.textContent = 'Error fetching recommendations. Please try again.';
+                msg.style.color = '#b30000';
+                msg.style.display = 'block';
+            }
+        });
+
+        function renderRecommendations(results) {
+            const grid = document.getElementById('recommendationsGrid');
+            grid.innerHTML = '';
+
+            if (!results || results.length === 0) {
+                grid.innerHTML = '<div class="no-recs">No recommendations available at the moment.</div>';
+                return;
+            }
+
+            for (const r of results) {
+                const card = document.createElement('div');
+                card.className = 'rec-card';
+
+                const imgHtml = r.image
+                    ? `<img class="card-img-top" src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}" onerror="this.style.display='none'">`
+                    : `<div class="img-placeholder">No cover</div>`;
+
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="card-body">
+                        <div class="book-title">${escapeHtml(r.title)}</div>
+                        <div class="author">${escapeHtml(r.authors)}</div>
+                        <div class="stats">
+                            <div>Votes: ${r.votes}</div>
+                            <div>Rating: ${Number(r.rating).toFixed(1)}/5</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function escapeHtml(text) {
+            return text ? text.replace(/[&<>"']/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[m]) : '';
+        }
+    </script>
+
+</body>
+</html>
