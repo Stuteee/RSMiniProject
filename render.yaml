@@ -1,4 +1,7 @@
-build:
-  python_version: 3.10
-start:
-  command: gunicorn app:app
+services:
+  - type: web
+    name: my-flask-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    pythonVersion: 3.10
